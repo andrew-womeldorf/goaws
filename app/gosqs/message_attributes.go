@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Admiral-Piett/goaws/app"
+	"github.com/Admiral-Piett/goaws/app/models"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,8 +43,8 @@ func extractMessageAttributes(req *http.Request, prefix string) map[string]app.M
 	return attributes
 }
 
-func getMessageAttributeResult(a *app.MessageAttributeValue) *app.ResultMessageAttribute {
-	v := &app.ResultMessageAttributeValue{
+func getMessageAttributeResult(a *app.MessageAttributeValue) *models.ResultMessageAttribute {
+	v := &models.ResultMessageAttributeValue{
 		DataType: a.DataType,
 	}
 
@@ -56,7 +57,7 @@ func getMessageAttributeResult(a *app.MessageAttributeValue) *app.ResultMessageA
 		v.StringValue = a.Value
 	}
 
-	return &app.ResultMessageAttribute{
+	return &models.ResultMessageAttribute{
 		Name:  a.Name,
 		Value: v,
 	}

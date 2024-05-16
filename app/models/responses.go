@@ -25,6 +25,56 @@ func (r ErrorResponse) GetRequestId() string {
 	return r.RequestId
 }
 
+/*** Receive Message Response */
+type ReceiveMessageResult struct {
+	Message []*ResultMessage `json:"Message" xml:"Message,omitempty"`
+}
+
+type ReceiveMessageResponse struct {
+	Xmlns    string               `xml:"xmlns,attr"`
+	Result   ReceiveMessageResult `xml:"ReceiveMessageResult"`
+	Metadata app.ResponseMetadata `xml:"ResponseMetadata"`
+}
+
+type ResultMessage struct {
+	MessageId              string                    `xml:"MessageId,omitempty"`
+	ReceiptHandle          string                    `xml:"ReceiptHandle,omitempty"`
+	MD5OfBody              string                    `xml:"MD5OfBody,omitempty"`
+	Body                   []byte                    `xml:"Body,omitempty"`
+	MD5OfMessageAttributes string                    `xml:"MD5OfMessageAttributes,omitempty"`
+	MessageAttributes      []*ResultMessageAttribute `xml:"MessageAttribute,omitempty"`
+	Attributes             []*ResultAttribute        `xml:"Attribute,omitempty"`
+}
+
+type ResultMessageAttributeValue struct {
+	DataType    string `xml:"DataType,omitempty"`
+	StringValue string `xml:"StringValue,omitempty"`
+	BinaryValue string `xml:"BinaryValue,omitempty"`
+}
+
+type ResultMessageAttribute struct {
+	Name  string                       `xml:"Name,omitempty"`
+	Value *ResultMessageAttributeValue `xml:"Value,omitempty"`
+}
+
+type ResultAttribute struct {
+	Name  string `xml:"Name,omitempty"`
+	Value string `xml:"Value,omitempty"`
+}
+
+type ChangeMessageVisibilityResult struct {
+	Xmlns    string               `xml:"xmlns,attr"`
+	Metadata app.ResponseMetadata `xml:"ResponseMetadata"`
+}
+
+func (r ReceiveMessageResponse) GetResult() interface{} {
+	return r.Result
+}
+
+func (r ReceiveMessageResponse) GetRequestId() string {
+	return r.Metadata.RequestId
+}
+
 /*** Create Queue Response */
 type CreateQueueResult struct {
 	QueueUrl string `json:"QueueUrl" xml:"QueueUrl"`

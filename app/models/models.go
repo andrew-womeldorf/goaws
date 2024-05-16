@@ -30,6 +30,23 @@ var AVAILABLE_QUEUE_ATTRIBUTES = map[string]bool{
 	"QueueArn":                              true,
 }
 
+func NewReceiveMessageRequest() *ReceiveMessageRequest {
+	return &ReceiveMessageRequest{}
+}
+
+type ReceiveMessageRequest struct {
+	QueueUrl                    string   `json:"QueueUrl" schema:"QueueUrl"`
+	AttributeNames              []string `json:"AttributeNames" schema:"AttributeNames"`
+	MessageSystemAttributeNames []string `json:"MessageSystemAttributeNames" schema:"MessageSystemAttributeNames"`
+	MessageAttributeNames       []string `json:"MessageAttributeNames" schema:"MessageAttributeNames"`
+	MaxNumberOfMessages         int      `json:"MaxNumberOfMessages" schema:"MaxNumberOfMessages"`
+	VisibilityTimeout           int      `json:"VisibilityTimeout" schema:"VisibilityTimeout"`
+	WaitTimeSeconds             int      `json:"WaitTimeSeconds" schema:"WaitTimeSeconds"`
+	ReceiveRequestAttemptId     string   `json:"ReceiveRequestAttemptId" schema:"ReceiveRequestAttemptId"`
+}
+
+func (r *ReceiveMessageRequest) SetAttributesFromForm(values url.Values) {}
+
 func NewCreateQueueRequest() *CreateQueueRequest {
 	return &CreateQueueRequest{
 		Attributes: Attributes{
