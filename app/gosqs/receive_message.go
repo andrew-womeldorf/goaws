@@ -42,7 +42,6 @@ func ReceiveMessageV1(req *http.Request) (int, interfaces.AbstractResponseBody) 
 	}
 
 	var messages []*models.ResultMessage
-	//	respMsg := ResultMessage{}
 	respStruct := models.ReceiveMessageResponse{}
 
 	waitTimeSeconds := requestBody.WaitTimeSeconds
@@ -122,11 +121,10 @@ func ReceiveMessageV1(req *http.Request) (int, interfaces.AbstractResponseBody) 
 			numMsg++
 		}
 
-		//		respMsg = ResultMessage{MessageId: messages.Uuid, ReceiptHandle: messages.ReceiptHandle, MD5OfBody: messages.MD5OfMessageBody, Body: messages.MessageBody, MD5OfMessageAttributes: messages.MD5OfMessageAttributes}
 		respStruct = models.ReceiveMessageResponse{
 			"http://queue.amazonaws.com/doc/2012-11-05/",
 			models.ReceiveMessageResult{
-				Message: messages,
+				Messages: messages,
 			},
 			app.ResponseMetadata{
 				RequestId: "00000000-0000-0000-0000-000000000000",

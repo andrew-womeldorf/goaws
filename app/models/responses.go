@@ -1,6 +1,13 @@
 package models
 
-import "github.com/Admiral-Piett/goaws/app"
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/Admiral-Piett/goaws/app"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	sqstypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
+)
 
 // NOTE: Every response in here MUST implement the `AbstractResponseBody` interface in order to be used
 //  in `encodeResponse`
@@ -27,13 +34,21 @@ func (r ErrorResponse) GetRequestId() string {
 
 /*** Receive Message Response */
 type ReceiveMessageResult struct {
-	Message []*ResultMessage `json:"Message" xml:"Message,omitempty"`
+	Messages []*ResultMessage `json:"Messages" xml:"Message,omitempty"`
 }
 
 type ReceiveMessageResponse struct {
 	Xmlns    string               `xml:"xmlns,attr"`
 	Result   ReceiveMessageResult `xml:"ReceiveMessageResult"`
 	Metadata app.ResponseMetadata `xml:"ResponseMetadata"`
+}
+
+func (r ReceiveMessageResponse) GetResult() interface{} {
+	return r.Result
+}
+
+func (r ReceiveMessageResponse) GetRequestId() string {
+	return r.Metadata.RequestId
 }
 
 type ResultMessage struct {
@@ -44,6 +59,39 @@ type ResultMessage struct {
 	MD5OfMessageAttributes string                    `xml:"MD5OfMessageAttributes,omitempty"`
 	MessageAttributes      []*ResultMessageAttribute `xml:"MessageAttribute,omitempty"`
 	Attributes             []*ResultAttribute        `xml:"Attribute,omitempty"`
+}
+
+// MarshalJSON first converts the ResultMessage to the shape which the SDKs
+// expect. When receiving a response from the JSON API, it apparently expects
+// Attributes and MessageAttributes to be maps, rather than the former slice
+// shape.
+func (r *ResultMessage) MarshalJSON() ([]byte, error) {
+	m := &sqstypes.Message{
+		MessageId:              &r.MessageId,
+		ReceiptHandle:          &r.ReceiptHandle,
+		MD5OfBody:              &r.MD5OfBody,
+		Body:                   aws.String(string(r.Body)),
+		MD5OfMessageAttributes: &r.MD5OfMessageAttributes,
+		Attributes:             map[string]string{},
+		MessageAttributes:      map[string]sqstypes.MessageAttributeValue{},
+	}
+
+	for _, attr := range r.Attributes {
+		fmt.Println("hey andrew")
+		fmt.Println(attr.Name)
+		fmt.Println(attr.Value)
+		m.Attributes[attr.Name] = attr.Value
+	}
+
+	for _, attr := range r.MessageAttributes {
+		m.MessageAttributes[attr.Name] = sqstypes.MessageAttributeValue{
+			DataType:    &attr.Value.DataType,
+			StringValue: &attr.Value.StringValue,
+			BinaryValue: []byte(attr.Value.BinaryValue),
+		}
+	}
+
+	return json.Marshal(m)
 }
 
 type ResultMessageAttributeValue struct {
@@ -65,14 +113,6 @@ type ResultAttribute struct {
 type ChangeMessageVisibilityResult struct {
 	Xmlns    string               `xml:"xmlns,attr"`
 	Metadata app.ResponseMetadata `xml:"ResponseMetadata"`
-}
-
-func (r ReceiveMessageResponse) GetResult() interface{} {
-	return r.Result
-}
-
-func (r ReceiveMessageResponse) GetRequestId() string {
-	return r.Metadata.RequestId
 }
 
 /*** Create Queue Response */

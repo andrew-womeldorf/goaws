@@ -42,3 +42,15 @@ var CreateQueueV1RequestXML_NoAttributes = struct {
 	Version:   "2012-11-05",
 	QueueName: af.QueueName,
 }
+
+var SendMessageRequestBodyXML = struct {
+	Action      string `xml:"Action"`
+	QueuUrl     string `xml:"QueueUrl"`
+	MessageBody string `xml:"MessageBody"`
+	Version     string `xml:"Version"`
+}{
+	Action:      "SendMessage",
+	QueuUrl:     fmt.Sprintf("%s/new-queue-1", af.BASE_URL),
+	MessageBody: "Hello World",
+	Version:     "2012-11-05",
+}

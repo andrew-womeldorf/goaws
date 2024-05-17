@@ -41,6 +41,7 @@ func encodeResponse(w http.ResponseWriter, req *http.Request, statusCode int, bo
 		// Stupidly these `WriteHeader` calls have to be here, if they're at the start
 		// they lock the headers, at the end they're ignored.
 		w.WriteHeader(statusCode)
+
 		err := json.NewEncoder(w).Encode(body.GetResult())
 		if err != nil {
 			log.Errorf("Response Encoding Error: %v\nResponse: %+v", err, body)
