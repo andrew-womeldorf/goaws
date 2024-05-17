@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/Admiral-Piett/goaws/app"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -77,9 +76,6 @@ func (r *ResultMessage) MarshalJSON() ([]byte, error) {
 	}
 
 	for _, attr := range r.Attributes {
-		fmt.Println("hey andrew")
-		fmt.Println(attr.Name)
-		fmt.Println(attr.Value)
 		m.Attributes[attr.Name] = attr.Value
 	}
 
