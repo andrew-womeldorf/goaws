@@ -141,7 +141,7 @@ func TestReceiveMessage_CanceledByClientV1(t *testing.T) {
 		status, resp := ReceiveMessageV1(req)
 		assert.Equal(t, http.StatusOK, status)
 
-		if len(resp.GetResult().(models.ReceiveMessageResult).Message) != 0 {
+		if len(resp.GetResult().(models.ReceiveMessageResult).Messages) != 0 {
 			t.Fatal("expecting this ReceiveMessage() to not pickup this message as it should canceled before the Send()")
 		}
 	}()
@@ -194,7 +194,7 @@ func TestReceiveMessage_CanceledByClientV1(t *testing.T) {
 		t.Fatal("handler should return a message")
 	}
 
-	if len(result.Message) == 0 || string(result.Message[0].Body) == "12345\n" {
+	if len(result.Messages) == 0 || string(result.Messages[0].Body) == "12345\n" {
 		t.Fatal("handler should return a message")
 	}
 	if elapsed > 1*time.Second {

@@ -617,7 +617,7 @@ func TestRequeueing_ResetVisibilityTimeout(t *testing.T) {
 	status, resp := ReceiveMessageV1(req)
 	assert.Equal(t, status, http.StatusOK)
 
-	receiptHandle := resp.GetResult().(models.ReceiveMessageResult).Message[0].ReceiptHandle
+	receiptHandle := resp.GetResult().(models.ReceiveMessageResult).Messages[0].ReceiptHandle
 
 	// try to receive another message.
 	req, err = http.NewRequest("POST", "/", nil)
@@ -893,8 +893,8 @@ func TestSendingAndReceivingFromFIFOQueueReturnsSameMessageOnError(t *testing.T)
 	assert.Equal(t, status, http.StatusOK)
 
 	result := resp.GetResult().(models.ReceiveMessageResult)
-	receiptHandleFirst := result.Message[0].ReceiptHandle
-	if string(result.Message[0].Body) != "1" {
+	receiptHandleFirst := result.Messages[0].ReceiptHandle
+	if string(result.Messages[0].Body) != "1" {
 		t.Fatalf("should have received body 1: %s", err)
 	}
 
@@ -965,11 +965,11 @@ func TestSendingAndReceivingFromFIFOQueueReturnsSameMessageOnError(t *testing.T)
 		assert.Equal(t, status, http.StatusOK)
 
 		result := resp.GetResult().(models.ReceiveMessageResult)
-		if len(result.Message) == 0 {
+		if len(result.Messages) == 0 {
 			continue
 		}
 
-		if string(result.Message[0].Body) != "2" {
+		if string(result.Messages[0].Body) != "2" {
 			t.Fatalf("should have received body 2: %s", err)
 		}
 		break
