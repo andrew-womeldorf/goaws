@@ -414,48 +414,6 @@ func TestSendMessageBatchToFIFOQueue_POST_Success(t *testing.T) {
 	}
 }
 
-func TestChangeMessageVisibility_POST_SUCCESS(t *testing.T) {
-	req, err := http.NewRequest("POST", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	app.SyncQueues.Queues["testing"] = &app.Queue{Name: "testing"}
-	app.SyncQueues.Queues["testing"].Messages = []app.Message{{
-		MessageBody:   []byte("test1"),
-		ReceiptHandle: "123",
-	}}
-
-	form := url.Values{}
-	form.Add("Action", "ChangeMessageVisibility")
-	form.Add("QueueUrl", "http://localhost:4100/queue/testing")
-	form.Add("VisibilityTimeout", "0")
-	form.Add("ReceiptHandle", "123")
-	form.Add("Version", "2012-11-05")
-	req.PostForm = form
-
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(ChangeMessageVisibility)
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(rr, req)
-
-	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got \n%v want %v",
-			status, http.StatusOK)
-	}
-
-	// Check the response body is what we expect.
-	expected := `<ChangeMessageVisibilityResult xmlns="http://queue.amazonaws.com/doc/2012-11-05/">`
-	if !strings.Contains(rr.Body.String(), expected) {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
-	}
-}
-
 func TestRequeueing_VisibilityTimeoutExpires(t *testing.T) {
 	done := make(chan struct{}, 0)
 	go PeriodicTasks(1*time.Second, done)
@@ -650,13 +608,8 @@ func TestRequeueing_ResetVisibilityTimeout(t *testing.T) {
 	req.PostForm = form
 
 	rr = httptest.NewRecorder()
-	http.HandlerFunc(ChangeMessageVisibility).ServeHTTP(rr, req)
-
-	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got \n%v want %v",
-			status, http.StatusOK)
-	}
+	status, _ = ChangeMessageVisibilityV1(req)
+	assert.Equal(t, status, http.StatusOK)
 
 	// message needs to be requeued
 	req, err = http.NewRequest("POST", "/", nil)

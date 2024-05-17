@@ -61,23 +61,23 @@ func encodeResponse(w http.ResponseWriter, req *http.Request, statusCode int, bo
 
 // V1 - includes JSON Support (and of course the old XML).
 var routingTableV1 = map[string]func(r *http.Request) (int, interfaces.AbstractResponseBody){
-	"CreateQueue":        sqs.CreateQueueV1,
-	"ListQueues":         sqs.ListQueuesV1,
-	"GetQueueAttributes": sqs.GetQueueAttributesV1,
-	"ReceiveMessage":     sqs.ReceiveMessageV1,
+	"CreateQueue":             sqs.CreateQueueV1,
+	"ListQueues":              sqs.ListQueuesV1,
+	"GetQueueAttributes":      sqs.GetQueueAttributesV1,
+	"ReceiveMessage":          sqs.ReceiveMessageV1,
+	"ChangeMessageVisibility": sqs.ChangeMessageVisibilityV1,
 }
 
 var routingTable = map[string]http.HandlerFunc{
 	// SQS
-	"SetQueueAttributes":      sqs.SetQueueAttributes,
-	"SendMessage":             sqs.SendMessage,
-	"SendMessageBatch":        sqs.SendMessageBatch,
-	"DeleteMessage":           sqs.DeleteMessage,
-	"DeleteMessageBatch":      sqs.DeleteMessageBatch,
-	"GetQueueUrl":             sqs.GetQueueUrl,
-	"PurgeQueue":              sqs.PurgeQueue,
-	"DeleteQueue":             sqs.DeleteQueue,
-	"ChangeMessageVisibility": sqs.ChangeMessageVisibility,
+	"SetQueueAttributes": sqs.SetQueueAttributes,
+	"SendMessage":        sqs.SendMessage,
+	"SendMessageBatch":   sqs.SendMessageBatch,
+	"DeleteMessage":      sqs.DeleteMessage,
+	"DeleteMessageBatch": sqs.DeleteMessageBatch,
+	"GetQueueUrl":        sqs.GetQueueUrl,
+	"PurgeQueue":         sqs.PurgeQueue,
+	"DeleteQueue":        sqs.DeleteQueue,
 
 	// SNS
 	"ListTopics":                sns.ListTopics,

@@ -111,6 +111,14 @@ type ChangeMessageVisibilityResult struct {
 	Metadata app.ResponseMetadata `xml:"ResponseMetadata"`
 }
 
+func (r ChangeMessageVisibilityResult) GetResult() interface{} {
+	return nil
+}
+
+func (r ChangeMessageVisibilityResult) GetRequestId() string {
+	return r.Metadata.RequestId
+}
+
 /*** Create Queue Response */
 type CreateQueueResult struct {
 	QueueUrl string `json:"QueueUrl" xml:"QueueUrl"`

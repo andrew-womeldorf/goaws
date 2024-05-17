@@ -249,3 +249,15 @@ func (r *RedrivePolicy) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+
+func NewChangeMessageVisibilityRequest() *ChangeMessageVisibilityRequest {
+	return &ChangeMessageVisibilityRequest{}
+}
+
+type ChangeMessageVisibilityRequest struct {
+	QueueUrl          string `json:"QueueUrl" schema:"QueueUrl"`
+	ReceiptHandle     string `json:"ReceiptHandle" schema:"ReceiptHandle"`
+	VisibilityTimeout int    `json:"VisibilityTimeout" schema:"VisibilityTimeout"`
+}
+
+func (r *ChangeMessageVisibilityRequest) SetAttributesFromForm(values url.Values) {}
