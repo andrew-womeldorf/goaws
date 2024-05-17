@@ -888,14 +888,9 @@ func TestSendingAndReceivingFromFIFOQueueReturnsSameMessageOnError(t *testing.T)
 	form.Add("Version", "2012-11-05")
 	req.PostForm = form
 
-	rr = httptest.NewRecorder()
-	http.HandlerFunc(DeleteMessage).ServeHTTP(rr, req)
+	status, _ = DeleteMessageV1(req)
+	assert.Equal(t, status, http.StatusOK)
 
-	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got \n%v want %v",
-			status, http.StatusOK)
-	}
 	if len(app.SyncQueues.Queues["requeue-reset.fifo"].Messages) != 1 {
 		t.Fatal("there should be only 1 message in queue")
 	}

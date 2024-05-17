@@ -261,3 +261,14 @@ type ChangeMessageVisibilityRequest struct {
 }
 
 func (r *ChangeMessageVisibilityRequest) SetAttributesFromForm(values url.Values) {}
+
+func NewDeleteMessageRequest() *DeleteMessageRequest {
+	return &DeleteMessageRequest{}
+}
+
+type DeleteMessageRequest struct {
+	QueueUrl      string `json:"QueueUrl" schema:"QueueUrl"`
+	ReceiptHandle string `json:"ReceiptHandle" schema:"ReceiptHandle"`
+}
+
+func (r *DeleteMessageRequest) SetAttributesFromForm(values url.Values) {}

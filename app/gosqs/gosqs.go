@@ -419,58 +419,6 @@ func DeleteMessageBatch(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func DeleteMessage(w http.ResponseWriter, req *http.Request) {
-	// Sent response type
-	w.Header().Set("Content-Type", "application/xml")
-
-	// Retrieve FormValues required
-	receiptHandle := req.FormValue("ReceiptHandle")
-
-	// Retrieve FormValues required
-	queueUrl := getQueueFromPath(req.FormValue("QueueUrl"), req.URL.String())
-	queueName := ""
-	if queueUrl == "" {
-		vars := mux.Vars(req)
-		queueName = vars["queueName"]
-	} else {
-		uriSegments := strings.Split(queueUrl, "/")
-		queueName = uriSegments[len(uriSegments)-1]
-	}
-
-	log.Println("Deleting Message, Queue:", queueName, ", ReceiptHandle:", receiptHandle)
-
-	// Find queue/message with the receipt handle and delete
-	app.SyncQueues.Lock()
-	if _, ok := app.SyncQueues.Queues[queueName]; ok {
-		for i, msg := range app.SyncQueues.Queues[queueName].Messages {
-			if msg.ReceiptHandle == receiptHandle {
-				// Unlock messages for the group
-				log.Printf("FIFO Queue %s unlocking group %s:", queueName, msg.GroupID)
-				app.SyncQueues.Queues[queueName].UnlockGroup(msg.GroupID)
-				//Delete message from Q
-				app.SyncQueues.Queues[queueName].Messages = append(app.SyncQueues.Queues[queueName].Messages[:i], app.SyncQueues.Queues[queueName].Messages[i+1:]...)
-				delete(app.SyncQueues.Queues[queueName].Duplicates, msg.DeduplicationID)
-
-				app.SyncQueues.Unlock()
-				// Create, encode/xml and send response
-				respStruct := app.DeleteMessageResponse{"http://queue.amazonaws.com/doc/2012-11-05/", app.ResponseMetadata{RequestId: "00000000-0000-0000-0000-000000000001"}}
-				enc := xml.NewEncoder(w)
-				enc.Indent("  ", "    ")
-				if err := enc.Encode(respStruct); err != nil {
-					log.Printf("error: %v\n", err)
-				}
-				return
-			}
-		}
-		log.Println("Receipt Handle not found")
-	} else {
-		log.Println("Queue not found")
-	}
-	app.SyncQueues.Unlock()
-
-	createErrorResponse(w, req, "MessageDoesNotExist")
-}
-
 func DeleteQueue(w http.ResponseWriter, req *http.Request) {
 	// Sent response type
 	w.Header().Set("Content-Type", "application/xml")
